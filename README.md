@@ -35,6 +35,17 @@ export X13=/caminho/para/Xcode-13.4.1.app/Contents/Developer
 
 O iOS 8 não abre WebP: converta os mapas para JPG ou PNG antes de copiar. Para levar ao iPad, use o Finder (iPad → aba Arquivos → arraste para "Mesa RPG") e depois **Mapa → Arquivos do app**.
 
+### Grid automático pelo nome do arquivo
+
+Se o nome do arquivo tiver `quadrado <N>px (<M> m)`, o app configura o grid sozinho ao carregar o mapa pela opção **Arquivos do app**:
+
+```
+Netrunner Cafe - quadrado 128px (2 m).jpg   → quadrado de 128 px, 2 m por quadrado
+Mapa da loja - quadrado 70px.png            → quadrado de 70 px (metros não mudam)
+```
+
+O tamanho é em pixels da imagem original (se o app reduzir a imagem, o grid acompanha). Se a cena ainda tiver nome padrão ("Cena 1"…), ela ganha o nome do mapa.
+
 ## Estrutura
 
 ```

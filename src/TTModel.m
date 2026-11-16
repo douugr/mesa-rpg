@@ -217,7 +217,36 @@ static NSString *TTNewId(void) {
     [state writeToFile:[TTStore statePath] atomically:YES];
 }
 
++ (BOOL)parseGridFromFileName:(NSString *)fileName cellSize:(CGFloat *)cellSize meters:(CGFloat *)meters {
+    static NSRegularExpression *re;
+    static dispatch_once_t once;
+    dispatch_once(&once, ^{
+        re = [NSRegularExpression regularExpressionWithPattern:@"quadrado\\s+([0-9]+(?:[.,][0-9]+)?)\\s*px(?:\\s*\\(\\s*([0-9]+(?:[.,][0-9]+)?)\\s*m\\s*\\))?"
+                                                       options:NSRegularExpressionCaseInsensitive
+                                                         error:nil];
+    });
+    if (!fileName.length) return NO;
+    NSTextCheckingResult *m = [re firstMatchInString:fileName options:0 range:NSMakeRange(0, fileName.length)];
+    if (!m) return NO;
+    NSString *px = [[fileName substringWithRange:[m rangeAtIndex:1]] stringByReplacingOccurrencesOfString:@"," withString:@"."];
+    CGFloat size = [px doubleValue];
+    if (size <= 0) return NO;
+    if (cellSize) *cellSize = size;
+    if (meters) {
+        *meters = 0;
+        if ([m rangeAtIndex:2].location != NSNotFound) {
+            NSString *mt = [[fileName substringWithRange:[m rangeAtIndex:2]] stringByReplacingOccurrencesOfString:@"," withString:@"."];
+            *meters = [mt doubleValue];
+        }
+    }
+    return YES;
+}
+
 - (void)setMapImage:(UIImage *)image forScene:(TTScene *)scene {
+    [self setMapImage:image forScene:scene cellSize:0 meters:0];
+}
+
+- (void)setMapImage:(UIImage *)image forScene:(TTScene *)scene cellSize:(CGFloat)hintCell meters:(CGFloat)hintMeters {
     if (!image) return;
     CGSize src = image.size;
     CGFloat scale = MIN(1.0, kTTMaxImageSide / MAX(src.width, src.height));
@@ -241,8 +270,18 @@ static NSString *TTNewId(void) {
     scene.imageFile = file;
     scene.boardWidth = dst.width;
     scene.boardHeight = dst.height;
-    // Mantém a proporção do grid em relação à largura da mesa
-    scene.cellSize = MAX(8, oldCell * (dst.width / MAX(1, oldWidth)));
+    if (hintCell > 0) {
+        // Grid informado no nome do arquivo, em pixels da imagem original
+        // (dst está em pixels; image.size em pontos, então pixels originais = size × image.scale)
+        CGFloat pixelScale = scale / (image.scale > 0 ? image.scale : 1.0);
+        scene.cellSize = MAX(8, hintCell * pixelScale);
+    } else {
+        // Mantém a proporção do grid em relação à largura da mesa
+        scene.cellSize = MAX(8, oldCell * (dst.width / MAX(1, oldWidth)));
+    }
+    if (hintMeters > 0) {
+        scene.metersPerCell = hintMeters;
+    }
     scene.offsetX = 0;
     scene.offsetY = 0;
     [self save];

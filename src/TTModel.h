@@ -54,5 +54,10 @@ NSInteger TTTokenColorCount(void);
 - (void)save;
 // Redimensiona a imagem (no máx. 3072 px), grava como JPEG e associa à cena
 - (void)setMapImage:(UIImage *)image forScene:(TTScene *)scene;
+// Igual ao anterior, mas aplica o grid informado (tamanho do quadrado em pixels da imagem
+// original e metros por quadrado). Valores <= 0 são ignorados.
+- (void)setMapImage:(UIImage *)image forScene:(TTScene *)scene cellSize:(CGFloat)cellSize meters:(CGFloat)meters;
+// Lê "quadrado 128px (2 m)" do nome do arquivo. Retorna NO se não encontrar.
++ (BOOL)parseGridFromFileName:(NSString *)fileName cellSize:(CGFloat *)cellSize meters:(CGFloat *)meters;
 - (void)removeMapForScene:(TTScene *)scene;
 @end

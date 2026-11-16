@@ -334,11 +334,28 @@ static const CGFloat kTTInitiativeWidth = 300;
 }
 
 - (void)applyMapImage:(UIImage *)image {
+    [self applyMapImage:image fileName:nil];
+}
+
+- (void)applyMapImage:(UIImage *)image fileName:(NSString *)fileName {
     if (!image) {
         [self showMessage:@"Erro" text:@"Não foi possível abrir a imagem."];
         return;
     }
-    [self.store setMapImage:image forScene:self.scene];
+    CGFloat cell = 0, meters = 0;
+    BOOL hasGrid = [TTStore parseGridFromFileName:fileName cellSize:&cell meters:&meters];
+    [self.store setMapImage:image forScene:self.scene cellSize:(hasGrid ? cell : 0) meters:(hasGrid ? meters : 0)];
+    // Nome da cena vazio/padrão? Usa o nome do mapa (sem a parte do grid)
+    if (fileName.length && [self.scene.name hasPrefix:@"Cena "]) {
+        NSString *base = fileName.stringByDeletingPathExtension;
+        NSRange cut = [base rangeOfString:@" - quadrado" options:NSCaseInsensitiveSearch];
+        if (cut.location == NSNotFound) cut = [base rangeOfString:@" - sem grid" options:NSCaseInsensitiveSearch];
+        if (cut.location != NSNotFound) base = [base substringToIndex:cut.location];
+        if (base.length) {
+            self.scene.name = base;
+            [self.store save];
+        }
+    }
     [self loadCurrentScene];
 }
 
@@ -359,9 +376,9 @@ static const CGFloat kTTInitiativeWidth = 300;
     }
     UIAlertController *sheet = [UIAlertController alertControllerWithTitle:@"Arquivos do app" message:nil preferredStyle:UIAlertControllerStyleActionSheet];
     for (NSString *f in images) {
-        [sheet addAction:[UIAlertAction actionWithTitle:f style:UIAlertActionStyleDefault handler:^(UIAlertAction *a) {
+        [sheet addAction:[UIAlertAction actionWithTitle:f.stringByDeletingPathExtension style:UIAlertActionStyleDefault handler:^(UIAlertAction *a) {
             UIImage *image = [UIImage imageWithContentsOfFile:[docs stringByAppendingPathComponent:f]];
-            [self applyMapImage:image];
+            [self applyMapImage:image fileName:f];
         }]];
     }
     [sheet addAction:[UIAlertAction actionWithTitle:@"Cancelar" style:UIAlertActionStyleCancel handler:nil]];
