@@ -3,9 +3,9 @@
 <plist version="1.0">
 <dict>
 	<key>CFBundleDevelopmentRegion</key>
-	<string>pt_BR</string>
+	<string>en</string>
 	<key>CFBundleDisplayName</key>
-	<string>Mesa RPG</string>
+	<string>Tabletop</string>
 	<key>CFBundleExecutable</key>
 	<string>Tabletop</string>
 	<key>CFBundleIdentifier</key>

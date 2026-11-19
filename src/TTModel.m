@@ -77,7 +77,7 @@ static NSString *TTNewId(void) {
 - (instancetype)init {
     if ((self = [super init])) {
         _sceneId = TTNewId();
-        _name = @"Cena";
+        _name = @"Scene";
         _boardWidth = 2048;
         _boardHeight = 1536;
         _cellSize = 2048.0 / 24.0;
@@ -179,7 +179,7 @@ static NSString *TTNewId(void) {
         }
     }
     if (store.scenes.count == 0) {
-        [store addSceneNamed:@"Cena 1"];
+        [store addSceneNamed:@"Scene 1"];
     }
     NSInteger idx = [state[@"current"] integerValue];
     store.currentIndex = (idx >= 0 && idx < (NSInteger)store.scenes.count) ? idx : 0;
@@ -221,7 +221,7 @@ static NSString *TTNewId(void) {
     static NSRegularExpression *re;
     static dispatch_once_t once;
     dispatch_once(&once, ^{
-        re = [NSRegularExpression regularExpressionWithPattern:@"quadrado\\s+([0-9]+(?:[.,][0-9]+)?)\\s*px(?:\\s*\\(\\s*([0-9]+(?:[.,][0-9]+)?)\\s*m\\s*\\))?"
+        re = [NSRegularExpression regularExpressionWithPattern:@"(?:quadrado|square|grid)\\s+([0-9]+(?:[.,][0-9]+)?)\\s*px(?:\\s*\\(\\s*([0-9]+(?:[.,][0-9]+)?)\\s*m\\s*\\))?"
                                                        options:NSRegularExpressionCaseInsensitive
                                                          error:nil];
     });

@@ -190,7 +190,7 @@
     // Diagonal conta como 1 quadrado (Cyberpunk RED / D&D 5e)
     NSInteger d = (NSInteger)MAX(fabs(a.x - b.x), fabs(a.y - b.y));
     double meters = d * self.scene.metersPerCell;
-    return [NSString stringWithFormat:@"  %ld quad. · %g m  ", (long)d, meters];
+    return [NSString stringWithFormat:@"  %ld sq. · %g m  ", (long)d, meters];
 }
 
 #pragma mark Reload

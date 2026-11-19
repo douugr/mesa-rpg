@@ -94,11 +94,11 @@ static const CGFloat kTTInitiativeWidth = 300;
     self.titleLabel.minimumScaleFactor = 0.6;
     [self.toolbar addSubview:self.titleLabel];
 
-    self.scenesButton = [self toolbarButton:@"Cenas" action:@selector(scenesTapped)];
-    self.mapButton = [self toolbarButton:@"Mapa" action:@selector(mapTapped)];
+    self.scenesButton = [self toolbarButton:@"Scenes" action:@selector(scenesTapped)];
+    self.mapButton = [self toolbarButton:@"Map" action:@selector(mapTapped)];
     self.gridButton = [self toolbarButton:@"Grid" action:@selector(gridTapped)];
     self.addTokenButton = [self toolbarButton:@"+ Token" action:@selector(addTokenTapped)];
-    self.initiativeButton = [self toolbarButton:@"Iniciativa" action:@selector(initiativeTapped)];
+    self.initiativeButton = [self toolbarButton:@"Initiative" action:@selector(initiativeTapped)];
 
     [self buildGridPanel];
     [self buildInitiativePanel];
@@ -231,7 +231,7 @@ static const CGFloat kTTInitiativeWidth = 300;
         f.clearButtonMode = UITextFieldViewModeWhileEditing;
     }];
     __weak UIAlertController *weakA = a;
-    [a addAction:[UIAlertAction actionWithTitle:@"Cancelar" style:UIAlertActionStyleCancel handler:nil]];
+    [a addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
     [a addAction:[UIAlertAction actionWithTitle:@"OK" style:UIAlertActionStyleDefault handler:^(UIAlertAction *act) {
         NSString *text = [weakA.textFields.firstObject.text stringByTrimmingCharactersInSet:[NSCharacterSet whitespaceCharacterSet]];
         if (text.length) completion(text);
@@ -242,7 +242,7 @@ static const CGFloat kTTInitiativeWidth = 300;
 #pragma mark - Cenas
 
 - (void)scenesTapped {
-    UIAlertController *sheet = [UIAlertController alertControllerWithTitle:@"Cenas" message:nil preferredStyle:UIAlertControllerStyleActionSheet];
+    UIAlertController *sheet = [UIAlertController alertControllerWithTitle:@"Scenes" message:nil preferredStyle:UIAlertControllerStyleActionSheet];
     for (NSInteger i = 0; i < (NSInteger)self.store.scenes.count; i++) {
         TTScene *s = self.store.scenes[i];
         NSString *title = (i == self.store.currentIndex) ? [NSString stringWithFormat:@"%@ ✓", s.name] : s.name;
@@ -252,35 +252,35 @@ static const CGFloat kTTInitiativeWidth = 300;
             [self loadCurrentScene];
         }]];
     }
-    [sheet addAction:[UIAlertAction actionWithTitle:@"Nova cena…" style:UIAlertActionStyleDefault handler:^(UIAlertAction *a) {
-        NSString *suggestion = [NSString stringWithFormat:@"Cena %lu", (unsigned long)self.store.scenes.count + 1];
-        [self askForText:@"Nome da nova cena" initial:suggestion completion:^(NSString *text) {
+    [sheet addAction:[UIAlertAction actionWithTitle:@"New scene…" style:UIAlertActionStyleDefault handler:^(UIAlertAction *a) {
+        NSString *suggestion = [NSString stringWithFormat:@"Scene %lu", (unsigned long)self.store.scenes.count + 1];
+        [self askForText:@"New scene name" initial:suggestion completion:^(NSString *text) {
             [self.store addSceneNamed:text];
             [self loadCurrentScene];
         }];
     }]];
-    [sheet addAction:[UIAlertAction actionWithTitle:@"Renomear cena atual…" style:UIAlertActionStyleDefault handler:^(UIAlertAction *a) {
-        [self askForText:@"Nome da cena" initial:self.scene.name completion:^(NSString *text) {
+    [sheet addAction:[UIAlertAction actionWithTitle:@"Rename current scene…" style:UIAlertActionStyleDefault handler:^(UIAlertAction *a) {
+        [self askForText:@"Scene name" initial:self.scene.name completion:^(NSString *text) {
             self.scene.name = text;
             self.titleLabel.text = text;
             [self.store save];
         }];
     }]];
     if (self.store.scenes.count > 1) {
-        [sheet addAction:[UIAlertAction actionWithTitle:@"Apagar cena atual" style:UIAlertActionStyleDestructive handler:^(UIAlertAction *a) {
+        [sheet addAction:[UIAlertAction actionWithTitle:@"Delete current scene" style:UIAlertActionStyleDestructive handler:^(UIAlertAction *a) {
             [self confirmDeleteScene];
         }]];
     }
-    [sheet addAction:[UIAlertAction actionWithTitle:@"Cancelar" style:UIAlertActionStyleCancel handler:nil]];
+    [sheet addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
     [self presentSheet:sheet from:self.scenesButton];
 }
 
 - (void)confirmDeleteScene {
-    UIAlertController *a = [UIAlertController alertControllerWithTitle:[NSString stringWithFormat:@"Apagar \"%@\"?", self.scene.name]
-                                                               message:@"O mapa e os tokens desta cena serão apagados."
+    UIAlertController *a = [UIAlertController alertControllerWithTitle:[NSString stringWithFormat:@"Delete \"%@\"?", self.scene.name]
+                                                               message:@"This scene's map and tokens will be deleted."
                                                         preferredStyle:UIAlertControllerStyleAlert];
-    [a addAction:[UIAlertAction actionWithTitle:@"Cancelar" style:UIAlertActionStyleCancel handler:nil]];
-    [a addAction:[UIAlertAction actionWithTitle:@"Apagar" style:UIAlertActionStyleDestructive handler:^(UIAlertAction *act) {
+    [a addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
+    [a addAction:[UIAlertAction actionWithTitle:@"Delete" style:UIAlertActionStyleDestructive handler:^(UIAlertAction *act) {
         [self.store removeCurrentScene];
         [self loadCurrentScene];
     }]];
@@ -290,27 +290,27 @@ static const CGFloat kTTInitiativeWidth = 300;
 #pragma mark - Mapa
 
 - (void)mapTapped {
-    UIAlertController *sheet = [UIAlertController alertControllerWithTitle:@"Mapa da cena" message:nil preferredStyle:UIAlertControllerStyleActionSheet];
-    [sheet addAction:[UIAlertAction actionWithTitle:@"Escolher das Fotos" style:UIAlertActionStyleDefault handler:^(UIAlertAction *a) {
+    UIAlertController *sheet = [UIAlertController alertControllerWithTitle:@"Scene map" message:nil preferredStyle:UIAlertControllerStyleActionSheet];
+    [sheet addAction:[UIAlertAction actionWithTitle:@"Choose from Photos" style:UIAlertActionStyleDefault handler:^(UIAlertAction *a) {
         [self pickFromPhotos];
     }]];
-    [sheet addAction:[UIAlertAction actionWithTitle:@"Arquivos do app (Finder / SSH)" style:UIAlertActionStyleDefault handler:^(UIAlertAction *a) {
+    [sheet addAction:[UIAlertAction actionWithTitle:@"App files (Documents folder)" style:UIAlertActionStyleDefault handler:^(UIAlertAction *a) {
         [self pickFromDocuments];
     }]];
     if (self.scene.imageFile) {
-        [sheet addAction:[UIAlertAction actionWithTitle:@"Remover mapa" style:UIAlertActionStyleDestructive handler:^(UIAlertAction *a) {
+        [sheet addAction:[UIAlertAction actionWithTitle:@"Remove map" style:UIAlertActionStyleDestructive handler:^(UIAlertAction *a) {
             [self.store removeMapForScene:self.scene];
             [self.store save];
             [self loadCurrentScene];
         }]];
     }
-    [sheet addAction:[UIAlertAction actionWithTitle:@"Cancelar" style:UIAlertActionStyleCancel handler:nil]];
+    [sheet addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
     [self presentSheet:sheet from:self.mapButton];
 }
 
 - (void)pickFromPhotos {
     if (![UIImagePickerController isSourceTypeAvailable:UIImagePickerControllerSourceTypePhotoLibrary]) {
-        [self showMessage:@"Fotos indisponíveis" text:@"Não foi possível acessar a biblioteca de fotos."];
+        [self showMessage:@"Photos unavailable" text:@"Could not access the photo library."];
         return;
     }
     UIImagePickerController *picker = [[UIImagePickerController alloc] init];
@@ -339,18 +339,22 @@ static const CGFloat kTTInitiativeWidth = 300;
 
 - (void)applyMapImage:(UIImage *)image fileName:(NSString *)fileName {
     if (!image) {
-        [self showMessage:@"Erro" text:@"Não foi possível abrir a imagem."];
+        [self showMessage:@"Error" text:@"Could not open the image."];
         return;
     }
     CGFloat cell = 0, meters = 0;
     BOOL hasGrid = [TTStore parseGridFromFileName:fileName cellSize:&cell meters:&meters];
     [self.store setMapImage:image forScene:self.scene cellSize:(hasGrid ? cell : 0) meters:(hasGrid ? meters : 0)];
-    // Nome da cena vazio/padrão? Usa o nome do mapa (sem a parte do grid)
-    if (fileName.length && [self.scene.name hasPrefix:@"Cena "]) {
+    // Default scene name? Use the map's file name (without the grid part)
+    if (fileName.length && ([self.scene.name hasPrefix:@"Scene "] || [self.scene.name hasPrefix:@"Cena "])) {
         NSString *base = fileName.stringByDeletingPathExtension;
-        NSRange cut = [base rangeOfString:@" - quadrado" options:NSCaseInsensitiveSearch];
-        if (cut.location == NSNotFound) cut = [base rangeOfString:@" - sem grid" options:NSCaseInsensitiveSearch];
-        if (cut.location != NSNotFound) base = [base substringToIndex:cut.location];
+        for (NSString *marker in @[@" - quadrado", @" - square", @" - grid", @" - sem grid", @" - no grid"]) {
+            NSRange cut = [base rangeOfString:marker options:NSCaseInsensitiveSearch];
+            if (cut.location != NSNotFound) {
+                base = [base substringToIndex:cut.location];
+                break;
+            }
+        }
         if (base.length) {
             self.scene.name = base;
             [self.store save];
@@ -370,18 +374,18 @@ static const CGFloat kTTInitiativeWidth = 300;
         }
     }
     if (images.count == 0) {
-        [self showMessage:@"Nenhuma imagem encontrada"
-                     text:@"Copie mapas (JPG ou PNG) para a pasta Documentos do app \"Mesa RPG\", pelo Finder (aba Arquivos do iPad) ou via SSH."];
+        [self showMessage:@"No images found"
+                     text:[NSString stringWithFormat:@"Copy maps (JPG or PNG) to this folder using Finder file sharing, SSH or Filza:\n%@", docs]];
         return;
     }
-    UIAlertController *sheet = [UIAlertController alertControllerWithTitle:@"Arquivos do app" message:nil preferredStyle:UIAlertControllerStyleActionSheet];
+    UIAlertController *sheet = [UIAlertController alertControllerWithTitle:@"App files" message:nil preferredStyle:UIAlertControllerStyleActionSheet];
     for (NSString *f in images) {
         [sheet addAction:[UIAlertAction actionWithTitle:f.stringByDeletingPathExtension style:UIAlertActionStyleDefault handler:^(UIAlertAction *a) {
             UIImage *image = [UIImage imageWithContentsOfFile:[docs stringByAppendingPathComponent:f]];
             [self applyMapImage:image fileName:f];
         }]];
     }
-    [sheet addAction:[UIAlertAction actionWithTitle:@"Cancelar" style:UIAlertActionStyleCancel handler:nil]];
+    [sheet addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
     [self presentSheet:sheet from:self.mapButton];
 }
 
@@ -416,7 +420,7 @@ static const CGFloat kTTInitiativeWidth = 300;
     self.gridPanel.hidden = YES;
     [self.view addSubview:self.gridPanel];
 
-    NSArray *titles = @[@"Tamanho do quadrado", @"Deslocar na horizontal", @"Deslocar na vertical", @"Opacidade", @"Mostrar grid", @"Metros por quadrado"];
+    NSArray *titles = @[@"Square size", @"Shift horizontally", @"Shift vertically", @"Opacity", @"Show grid", @"Meters per square"];
     for (NSInteger i = 0; i < (NSInteger)titles.count; i++) {
         UILabel *l = [self panelLabel:titles[i]];
         l.tag = 100 + i;
@@ -453,7 +457,7 @@ static const CGFloat kTTInitiativeWidth = 300;
     [self.gridPanel addSubview:self.metersValueLabel];
 
     UIButton *close = [UIButton buttonWithType:UIButtonTypeSystem];
-    [close setTitle:@"Fechar" forState:UIControlStateNormal];
+    [close setTitle:@"Close" forState:UIControlStateNormal];
     close.titleLabel.font = [UIFont boldSystemFontOfSize:17];
     [close setTitleColor:[UIColor colorWithRed:1 green:0.85 blue:0.2 alpha:1] forState:UIControlStateNormal];
     close.tag = 99;
@@ -518,7 +522,7 @@ static const CGFloat kTTInitiativeWidth = 300;
     TTScene *s = self.scene;
     NSInteger cols = (NSInteger)floor(s.boardWidth / MAX(1, s.cellSize));
     NSInteger rows = (NSInteger)floor(s.boardHeight / MAX(1, s.cellSize));
-    self.cellValueLabel.text = [NSString stringWithFormat:@"%.1f px · %ld × %ld quadrados", s.cellSize, (long)cols, (long)rows];
+    self.cellValueLabel.text = [NSString stringWithFormat:@"%.1f px · %ld × %ld squares", s.cellSize, (long)cols, (long)rows];
     self.metersValueLabel.text = [NSString stringWithFormat:@"%g m", s.metersPerCell];
 }
 
@@ -593,25 +597,25 @@ static const CGFloat kTTInitiativeWidth = 300;
 
 - (void)editToken:(TTToken *)t {
     UIAlertController *a = [UIAlertController alertControllerWithTitle:t.name
-                                                               message:@"Rótulo: até 3 letras no círculo. PV máximo 0 esconde os PV."
+                                                               message:@"Label: up to 3 letters in the circle. Max HP 0 hides the HP."
                                                         preferredStyle:UIAlertControllerStyleAlert];
     [a addTextFieldWithConfigurationHandler:^(UITextField *f) {
-        f.placeholder = @"Nome";
+        f.placeholder = @"Name";
         f.text = t.name;
         f.autocapitalizationType = UITextAutocapitalizationTypeWords;
     }];
     [a addTextFieldWithConfigurationHandler:^(UITextField *f) {
-        f.placeholder = @"Rótulo (ex.: V, G1)";
+        f.placeholder = @"Label (e.g. V, G1)";
         f.text = t.label;
         f.autocapitalizationType = UITextAutocapitalizationTypeAllCharacters;
     }];
     [a addTextFieldWithConfigurationHandler:^(UITextField *f) {
-        f.placeholder = @"PV atual";
+        f.placeholder = @"Current HP";
         f.text = t.maxHp > 0 ? [NSString stringWithFormat:@"%ld", (long)t.hp] : @"";
         f.keyboardType = UIKeyboardTypeNumbersAndPunctuation;
     }];
     [a addTextFieldWithConfigurationHandler:^(UITextField *f) {
-        f.placeholder = @"PV máximo";
+        f.placeholder = @"Max HP";
         f.text = t.maxHp > 0 ? [NSString stringWithFormat:@"%ld", (long)t.maxHp] : @"";
         f.keyboardType = UIKeyboardTypeNumbersAndPunctuation;
     }];
@@ -628,38 +632,38 @@ static const CGFloat kTTInitiativeWidth = 300;
         t.hp = hpText.length ? [hpText integerValue] : t.maxHp;
     };
 
-    [a addAction:[UIAlertAction actionWithTitle:@"Salvar" style:UIAlertActionStyleDefault handler:^(UIAlertAction *act) {
+    [a addAction:[UIAlertAction actionWithTitle:@"Save" style:UIAlertActionStyleDefault handler:^(UIAlertAction *act) {
         apply();
         [self tokensChanged];
     }]];
-    [a addAction:[UIAlertAction actionWithTitle:@"Salvar e trocar cor" style:UIAlertActionStyleDefault handler:^(UIAlertAction *act) {
+    [a addAction:[UIAlertAction actionWithTitle:@"Save and change color" style:UIAlertActionStyleDefault handler:^(UIAlertAction *act) {
         apply();
         t.colorIndex = (t.colorIndex + 1) % TTTokenColorCount();
         [self tokensChanged];
     }]];
-    NSString *sizeTitle = [NSString stringWithFormat:@"Tamanho: %ld×%ld → %ld×%ld", (long)t.size, (long)t.size,
+    NSString *sizeTitle = [NSString stringWithFormat:@"Size: %ld×%ld → %ld×%ld", (long)t.size, (long)t.size,
                            (long)(t.size % 3 + 1), (long)(t.size % 3 + 1)];
     [a addAction:[UIAlertAction actionWithTitle:sizeTitle style:UIAlertActionStyleDefault handler:^(UIAlertAction *act) {
         apply();
         t.size = t.size % 3 + 1;
         [self tokensChanged];
     }]];
-    [a addAction:[UIAlertAction actionWithTitle:(t.down ? @"Levantar" : @"Marcar como caído") style:UIAlertActionStyleDefault handler:^(UIAlertAction *act) {
+    [a addAction:[UIAlertAction actionWithTitle:(t.down ? @"Stand up" : @"Mark as down") style:UIAlertActionStyleDefault handler:^(UIAlertAction *act) {
         apply();
         t.down = !t.down;
         [self tokensChanged];
     }]];
-    [a addAction:[UIAlertAction actionWithTitle:@"Duplicar" style:UIAlertActionStyleDefault handler:^(UIAlertAction *act) {
+    [a addAction:[UIAlertAction actionWithTitle:@"Duplicate" style:UIAlertActionStyleDefault handler:^(UIAlertAction *act) {
         apply();
         TTToken *copy = [t duplicate];
         copy.col = t.col + t.size;
         [self.scene.tokens addObject:copy];
         [self tokensChanged];
     }]];
-    [a addAction:[UIAlertAction actionWithTitle:@"Remover" style:UIAlertActionStyleDestructive handler:^(UIAlertAction *act) {
+    [a addAction:[UIAlertAction actionWithTitle:@"Remove" style:UIAlertActionStyleDestructive handler:^(UIAlertAction *act) {
         [self removeToken:t];
     }]];
-    [a addAction:[UIAlertAction actionWithTitle:@"Cancelar" style:UIAlertActionStyleCancel handler:nil]];
+    [a addAction:[UIAlertAction actionWithTitle:@"Cancel" style:UIAlertActionStyleCancel handler:nil]];
     [self presentViewController:a animated:YES completion:nil];
 }
 
@@ -704,9 +708,9 @@ static const CGFloat kTTInitiativeWidth = 300;
     self.roundLabel.font = [UIFont boldSystemFontOfSize:17];
     [self.initiativePanel addSubview:self.roundLabel];
 
-    self.nextTurnButton = [self panelButton:@"Iniciar" action:@selector(nextTurn)];
-    self.reorderButton = [self panelButton:@"Ordenar" action:@selector(toggleReorder)];
-    UIButton *end = [self panelButton:@"Encerrar" action:@selector(endCombat)];
+    self.nextTurnButton = [self panelButton:@"Start" action:@selector(nextTurn)];
+    self.reorderButton = [self panelButton:@"Sort" action:@selector(toggleReorder)];
+    UIButton *end = [self panelButton:@"End" action:@selector(endCombat)];
     end.tag = 77;
 
     self.initiativeTable = [[UITableView alloc] initWithFrame:CGRectZero style:UITableViewStylePlain];
@@ -745,11 +749,11 @@ static const CGFloat kTTInitiativeWidth = 300;
 - (void)updateRoundLabel {
     TTScene *s = self.scene;
     if (s.turnIndex < 0) {
-        self.roundLabel.text = @"Fora de combate";
-        [self.nextTurnButton setTitle:@"Iniciar" forState:UIControlStateNormal];
+        self.roundLabel.text = @"Out of combat";
+        [self.nextTurnButton setTitle:@"Start" forState:UIControlStateNormal];
     } else {
-        self.roundLabel.text = [NSString stringWithFormat:@"Rodada %ld", (long)s.round];
-        [self.nextTurnButton setTitle:@"Próximo" forState:UIControlStateNormal];
+        self.roundLabel.text = [NSString stringWithFormat:@"Round %ld", (long)s.round];
+        [self.nextTurnButton setTitle:@"Next" forState:UIControlStateNormal];
     }
 }
 
@@ -784,7 +788,7 @@ static const CGFloat kTTInitiativeWidth = 300;
 - (void)toggleReorder {
     BOOL editing = !self.initiativeTable.editing;
     [self.initiativeTable setEditing:editing animated:YES];
-    [self.reorderButton setTitle:(editing ? @"Pronto" : @"Ordenar") forState:UIControlStateNormal];
+    [self.reorderButton setTitle:(editing ? @"Done" : @"Sort") forState:UIControlStateNormal];
 }
 
 - (void)scrollToToken:(TTToken *)t {
@@ -822,8 +826,8 @@ static const CGFloat kTTInitiativeWidth = 300;
     BOOL active = (indexPath.row == s.turnIndex);
     cell.textLabel.text = [NSString stringWithFormat:@"%@%@", active ? @"▶ " : @"", t.name];
     NSMutableArray *details = [NSMutableArray array];
-    if (t.maxHp > 0) [details addObject:[NSString stringWithFormat:@"PV %ld/%ld", (long)t.hp, (long)t.maxHp]];
-    if (t.down) [details addObject:@"caído"];
+    if (t.maxHp > 0) [details addObject:[NSString stringWithFormat:@"HP %ld/%ld", (long)t.hp, (long)t.maxHp]];
+    if (t.down) [details addObject:@"down"];
     cell.detailTextLabel.text = details.count ? [details componentsJoinedByString:@" · "] : @" ";
     cell.imageView.image = [self dotImageWithColor:TTTokenColor(t.colorIndex)];
     cell.backgroundColor = active ? [UIColor colorWithRed:0.35 green:0.3 blue:0.05 alpha:1] : [UIColor clearColor];
