@@ -60,3 +60,7 @@ src/TTBoardView.*          map, grid, tokens and ruler
 src/TTMainViewController.* toolbar, grid panel, initiative, menus
 src/main.m                 AppDelegate
 ```
+
+## License
+
+MIT, see [LICENSE](LICENSE). The icon is original, made for the project.
